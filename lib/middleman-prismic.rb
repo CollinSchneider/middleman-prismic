@@ -1,4 +1,5 @@
 require 'prismic'
+require 'middleman-core'
 require 'middleman-prismic/version'
 require 'middleman-prismic/commands/prismic'
 
@@ -44,4 +45,4 @@ module MiddlemanPrismic
 
 end
 
-::Middleman::Extensions.register(:prismic, MiddlemanPrismic::Core)
+::Middleman::Extensions.register(:prismic, ::MiddlemanPrismic::Core)
