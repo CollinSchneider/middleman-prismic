@@ -14,7 +14,7 @@ module MiddlemanPrismic
     option :release, 'master', 'Content release'
     option(
       :link_resolver,
-      ->(link) {"http://www.example.com/#{link.type.pluralize}/#{link.slug}"},
+      ->(link) { byebug; "http://www.example.com/#{link.type.pluralize}/#{link.slug}" },
       'The link resolver'
     )
     option :custom_queries, {}, 'Custom queries'

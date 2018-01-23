@@ -31,41 +31,40 @@ module Middleman
         response = api.form('everything').submit(api.ref(reference))
 
         available_documents = []
-        response.each {|d| available_documents << d.type}
+        response.each { |d| available_documents << d.type }
 
         available_documents.uniq!
 
         available_documents.each do |document_type|
           documents = response.select{|d| d.type == document_type}
           documents.each do |document|
-            byebug
-            if document.fragments['s3_bucket_name']
-              s3_bucket = document.fragments['s3_bucket_name'].value
-            else
-              raise 'ERROR: Prismic meta tag s3_bucket_name not defined'
-            end
-            if document.fragments['template_name']
-              template = document.fragments['template_name'].value
-            else
-              raise 'ERROR: Prismic meta tag template_name not defined'
-            end
-            if File.exists?("#{data_dir}/prismic_#{document.slug.underscore}.yml")
+            unique_page_name = document.fragments['unique_page_name'].value.parameterize.underscore
+            if File.exists?("#{data_dir}/prismic_#{unique_page_name}.yml")
               raise "ERROR: yml file already exists for document slug #{document.slug}"
             else
-              File.open("#{data_dir}/prismic_#{document.slug.underscore}.yml", 'w') do |f|
-                f.write(Hash[[*document]].to_yaml)
-                # hash = {}
-                # document.fragments.each do |section_name, content|
-                #   # investigate as_html further!
-                #   begin
-                #     hash[section_name] = {}
-                #     hash[section_name]['html'] = content.as_html(nil)
-                #     hash[section_name]['text'] = content.text
-                #   rescue
-                #     puts "Unable to convert #{content.slug} to html"
-                #   end
-                # end
-                # f.write(hash.to_yaml)
+              File.open("#{data_dir}/prismic_#{unique_page_name}.yml", 'w') do |f|
+                hash = {}
+                document.fragments.each do |section_name, content|
+                  begin
+                    hash[section_name] = {}
+                    # investigate as_html further!
+                    begin
+                      hash[section_name]['html'] = content.as_html(nil)
+                    rescue
+                      puts "Unable to convert #{content.class} to html"
+                    end
+                    begin
+                      hash[section_name]['text'] = content.as_text(nil)
+                    rescue
+                      puts "Unable to convert #{content.class} to text"
+                    end
+                  end
+                end
+                hash['s3_bucket_name'] = document.fragments['s3_bucket_name'].value
+                hash['template_name'] = document.fragments['template_name'].value
+                hash['page_id'] = document.id
+                hash['page_name'] = unique_page_name
+                f.write(hash.to_yaml)
               end
             end
           end
