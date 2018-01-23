@@ -18,6 +18,7 @@ module MiddlemanPrismic
       'The link resolver'
     )
     option :custom_queries, {}, 'Custom queries'
+    option :data_dir, 'data', 'Location of Current Data Directory. Defaults to Middleman Default'
 
     def initialize(app, options_hash={}, &block)
       super
@@ -26,20 +27,6 @@ module MiddlemanPrismic
     end
 
     helpers do
-      Dir["data/prismic_*"].each do |file|
-        define_method(file.gsub('data/prismic_','')) do
-          YAML::load(File.read(file)).values
-        end
-      end
-
-      def reference
-        ref = YAML::load(File.read('data/prismic_reference'))
-        ref.class.send(
-          :define_method, :link_to, MiddlemanPrismic.options.link_resolver
-        )
-
-        return ref
-      end
     end
   end
 

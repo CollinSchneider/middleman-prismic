@@ -20,8 +20,7 @@ module Middleman
       end
 
       def prismic
-        # ::Middleman::Application.server.inst
-        data_dir = ENV['MM_DATA_DIR'] || 'data'
+        data_dir = MiddlemanPrismic.options.data_dir
         reference = MiddlemanPrismic.options.release
 
         Dir.mkdir(data_dir) unless File.exists?(data_dir)
@@ -49,19 +48,13 @@ module Middleman
                   begin
                     hash[section_name] = content.as_html(nil)
                   rescue
+                    puts "Unable to convert #{content.slug} to html"
                   end
                 end
                 f.write(hash.to_yaml)
               end
             end
           end
-          # File.open("data/prismic_#{document_type.pluralize}.yml", 'w') do |f|
-          #   f.write(Hash[[*documents.map.with_index]].invert.to_yaml)
-          # end
-        end
-
-        File.open("#{data_dir}/prismic_reference.yml", 'w') do |f|
-          f.write(api.master_ref.to_yaml)
         end
 
         # MiddlemanPrismic.options.custom_queries.each do |k, v|
