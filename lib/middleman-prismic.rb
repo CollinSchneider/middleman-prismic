@@ -18,7 +18,7 @@ module MiddlemanPrismic
       'The link resolver'
     )
     option :custom_queries, {}, 'Custom queries'
-    option :data_dir, 'data', 'Location of Current Data Directory. Defaults to Middleman Default'
+    option :output_dir, 'data', 'Location where the data information is saved to. Defaults to Middleman Default'
 
     def initialize(app, options_hash={}, &block)
       super

@@ -20,15 +20,16 @@ module Middleman
       end
 
       def prismic
-        data_dir = MiddlemanPrismic.options.data_dir
+        output_dir = MiddlemanPrismic.options.output_dir
         reference = MiddlemanPrismic.options.release
 
-        Dir.mkdir(data_dir) unless File.exists?(data_dir)
+        Dir.mkdir(output_dir) unless File.exists?(output_dir)
 
-        FileUtils.rm_rf(Dir.glob("#{data_dir}/prismic_*"))
+        FileUtils.rm_rf(Dir.glob("#{output_dir}/prismic_*"))
 
         api = ::Prismic.api(MiddlemanPrismic.options.api_url)
-        response = api.form('everything').submit(api.ref(reference))
+        query = MiddlemanPrismic.options.custom_queries[:last_publication_date]
+        response = api.form('everything').query(query).submit(api.ref(reference))
 
         available_documents = []
         response.each { |d| available_documents << d.type }
@@ -39,10 +40,10 @@ module Middleman
           documents = response.select{|d| d.type == document_type}
           documents.each do |document|
             unique_page_name = document.fragments['unique_page_name'].value.parameterize.underscore
-            if File.exists?("#{data_dir}/prismic_#{unique_page_name}.yml")
+            if File.exists?("#{output_dir}/prismic_#{unique_page_name}.yml")
               raise "ERROR: yml file already exists for document slug #{document.slug}"
             else
-              File.open("#{data_dir}/prismic_#{unique_page_name}.yml", 'w') do |f|
+              File.open("#{output_dir}/prismic_#{unique_page_name}.yml", 'w') do |f|
                 hash = {}
                 document.fragments.each do |section_name, content|
                   begin
