@@ -49,16 +49,21 @@ module Middleman
                   begin
                     hash[section_name] = {}
                     # investigate as_html further!
+                    if content.class.to_s == 'Prismic::Fragments::Image'
+                      hash[section_name]['src'] = content.url
+                    end
                     begin
                       hash[section_name]['html'] = content.as_html(nil)
                     rescue
                       puts "Unable to convert #{content.class} to html"
                     end
                     begin
-                      hash[section_name]['text'] = content.as_text(nil)
+                      hash[section_name]['text'] = content.value
+                      # hash[section_name]['text'] = content.as_text
                     rescue
                       puts "Unable to convert #{content.class} to text"
                     end
+
                   end
                 end
                 hash['s3_bucket_name'] = document.fragments['s3_bucket_name'].value
